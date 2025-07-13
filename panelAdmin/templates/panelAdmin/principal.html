@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Monitor del Sistema</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .card { border: 1px solid #ccc; padding: 15px; margin: 10px 0; border-radius: 5px; }
+    </style>
+    <script>
+        function autoActualizar() {
+            setTimeout(() => location.reload(), 5000); // recarga cada 5 segundos
+        }
+        window.onload = autoActualizar;
+    </script>
+</head>
+<body>
+    <h1>Monitor del Sistema</h1>
+
+    {% if datos.error %}
+        <div class="card" style="color: red;"><strong>Error:</strong> {{ datos.error }}</div>
+    {% else %}
+        <div class="card"><strong>CPU:</strong> {{ datos.cpu_uso }}%</div>
+        <div class="card"><strong>RAM:</strong> {{ datos.memoria_usada }} GB / {{ datos.memoria_total }} GB ({{ datos.memoria_porcentaje }}%)</div>
+        <div class="card"><strong>Disco:</strong> {{ datos.disco_usado }} GB usados, {{ datos.disco_libre }} GB libres ({{ datos.disco_total }} GB totales)</div>
+        <div class="card"><strong>Sistema Operativo:</strong> {{ datos.sistema }} {{ datos.version }}</div>
+        <div class="card"><strong>Núcleos Físicos:</strong> {{ datos.nucleos }} | <strong>Totales:</strong> {{ datos.nucleos_logicos }}</div>
+    {% endif %}
+
+    <form method="get">
+        <button type="submit">Actualizar Manualmente</button>
+    </form>
+</body>
+</html>
