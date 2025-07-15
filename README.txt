@@ -1,6 +1,6 @@
 #Examen 2 Arquitectura de Computadoras#
 
-#Monitor de sistema creado en Django y psutil#
+#Monitor de sistema creado en Django y psutil
 
 Skarleth Mariela Carcamo 202210030115
 Jahir Emanuel Cano Carrasco 202310020389
