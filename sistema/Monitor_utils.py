@@ -19,10 +19,11 @@ def obtener_info_sistema():
             'disco_usado': round(disco.used / (1024**3), 2),
             'disco_total': round(disco.total / (1024**3), 2),
             'disco_libre': round(disco.free / (1024**3), 2),
+            'disco_porcentaje': disco.percent,
             'sistema': sistema,
             'version': version,
             'nucleos': nucleos,
-            'nucleos_logicos': nucleos_logicos
+            'nucleos_logicos': nucleos_logicos,
         }
 
     except Exception as e:

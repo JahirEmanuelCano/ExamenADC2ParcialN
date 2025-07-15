@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🖥 Monitoreo del Sistema</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 3em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.2em;
+        }
+
+        .controls {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+            animation: fadeIn 0.6s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .card-icon {
+            font-size: 2.5em;
+            margin-right: 15px;
+            animation: pulse 2s infinite;
+        }
+
+        .card-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #2c3e50;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .metric:hover {
+            background: rgba(255,255,255,0.8);
+            transform: translateX(5px);
+        }
+
+        .metric-label {
+            font-weight: 600;
+            color: #34495e;
+            font-size: 1.1em;
+        }
+
+        .metric-value {
+            font-weight: 700;
+            font-size: 1.2em;
+            color: #2c3e50;
+        }
+
+        .progress-container {
+            margin-top: 15px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.8s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        .progress-cpu { 
+            background: linear-gradient(90deg, #FF6B6B, #FF8E8E);
+        }
+
+        .progress-memory { 
+            background: linear-gradient(90deg, #4ECDC4, #7FDBDA);
+        }
+
+        .progress-disk { 
+            background: linear-gradient(90deg, #45B7D1, #76C7E3);
+        }
+
+        .status {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            margin-top: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .status.online {
+            color: #27ae60;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .error {
+            color: #e74c3c;
+            background: rgba(231,76,60,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #e74c3c;
+            font-weight: 600;
+        }
+
+        .system-info {
+            grid-column: 1 / -1;
+        }
+
+        .system-info .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        /* Animaciones */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2.5em;
+            }
+            
+            .controls {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                margin: 0 auto;
+            }
+        }
+
+        /* Indicadores de estado */
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        .status-good { background: #27ae60; }
+        .status-warning { background: #f39c12; }
+        .status-danger { background: #e74c3c; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🖥 Monitoreo del Sistema</h1>
+            <p>Monitoreo en tiempo real con Django y Psutil</p>
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="location.reload()">🔄 Actualizar Datos</button>
+            <button class="btn btn-secondary" onclick="toggleAutoRefresh()">⚡ Auto-Actualizar</button>
+        </div>
+
+        {% if datos.error %}
+            <div class="error">
+                <strong>⚠ Error:</strong> {{ datos.error }}
+            </div>
+        {% else %}
+            <div class="grid">
+                <!-- CPU Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🔥</div>
+                        <div class="card-title">Procesador</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="metric">
+                            <span class="metric-label">Uso del CPU:</span>
+                            <span class="metric-value">
+                                <span class="status-indicator {% if datos.cpu_uso < 50 %}status-good{% elif datos.cpu_uso < 80 %}status-warning{% else %}status-danger{% endif %}"></span>
+                                {{ datos.cpu_uso }}%
+                            </span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill progress-cpu" style="width: '{{ datos.cpu_uso }}%'"></div>
+                            </div>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Núcleos físicos:</span>
+                            <span class="metric-value">{{ datos.nucleos }}</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Núcleos lógicos:</span>
+                            <span class="metric-value">{{ datos.nucleos_logicos }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Memory Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">💾</div>
+                        <div class="card-title">Memoria RAM</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="metric">
+                            <span class="metric-label">Uso de RAM:</span>
+                            <span class="metric-value">
+                                <span class="status-indicator {% if datos.memoria_porcentaje < 60 %}status-good{% elif datos.memoria_porcentaje < 85 %}status-warning{% else %}status-danger{% endif %}"></span>
+                                {{ datos.memoria_porcentaje }}%
+                            </span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill progress-memory" style="width: '{{ datos.memoria_porcentaje }}%'"></div>
+                            </div>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Memoria total:</span>
+                            <span class="metric-value">{{ datos.memoria_total }} GB</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Memoria usada:</span>
+                            <span class="metric-value">{{ datos.memoria_usada }} GB</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Disk Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">💿</div>
+                        <div class="card-title">Almacenamiento</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="metric">
+                            <span class="metric-label">Uso del disco:</span>
+                            <span class="metric-value">
+                                <span class="status-indicator {% if datos.disco_porcentaje < 70 %}status-good{% elif datos.disco_porcentaje < 90 %}status-warning{% else %}status-danger{% endif %}"></span>
+                                {{ datos.disco_porcentaje }}%
+                            </span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill progress-disk" style="width: '{{ datos.disco_porcentaje }}%'"></div>
+                            </div>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Espacio total:</span>
+                            <span class="metric-value">{{ datos.disco_total }} GB</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Espacio usado:</span>
+                            <span class="metric-value">{{ datos.disco_usado }} GB</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Espacio libre:</span>
+                            <span class="metric-value">{{ datos.disco_libre }} GB</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Info Card -->
+                <div class="card system-info">
+                    <div class="card-header">
+                        <div class="card-icon">⚙</div>
+                        <div class="card-title">Información del Sistema</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="info-grid">
+                            <div class="metric">
+                                <span class="metric-label">Sistema Operativo:</span>
+                                <span class="metric-value">{{ datos.sistema }}</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Versión:</span>
+                                <span class="metric-value">{{ datos.version }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="status online">
+            <strong>🟢 Estado:</strong> El sistema esta funcionando correctamente.
+            <div>Última actualización: <span id="update-time"></span></div>
+        </div>
+    </div>
+
+    <script>
+        let autoRefreshInterval;
+        let isAutoRefreshEnabled = false;
+
+        function toggleAutoRefresh() {
+            if (isAutoRefreshEnabled) {
+                clearInterval(autoRefreshInterval);
+                isAutoRefreshEnabled = false;
+                alert('Auto-actualización desactivada');
+            } else {
+                autoRefreshInterval = setInterval(() => {
+                    location.reload();
+                }, 5000);
+                isAutoRefreshEnabled = true;
+                alert('Auto-actualización activada (cada 5 segundos)');
+            }
+        }
+
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString('es-ES');
+            document.getElementById('update-time').textContent = timeString;
+        }
+
+        setInterval(updateTime, 1000);
+        updateTime();
+    </script>
+</body>
+</html>
