@@ -13,3 +13,6 @@ básicos de la computadora como ser la memoria RAM, el espacio en disco duro y p
 
 Pasos para la ejecución del proyecto localmente.
 
+Dependencias principales 
+-Django 4.2
+-psutil
